@@ -1,0 +1,362 @@
+<html>
+	<head>
+    <title>Arkan0id</title>
+    <style type="text/css">
+            
+            p#title{
+                font-family: title;
+                font-size: 0.7em
+            }
+            
+            div#vidas, div#puntos{
+                float: left;
+                font-size: 1em;
+                margin-top: 610px;
+                margin-left: 20px;
+                }
+            
+            p#vidas{
+                margin-left: 60px;
+            }
+            
+            p#reintento{
+                font-size: 0.7em;
+                font-family: title2;
+                margin-top: 150px;
+              }
+            
+            #contenedora{background-image: url("imagenes/fondo.jpg");
+            top: 10px;
+            height: 600px ;
+            width: 900px;
+            border: solid grey 3px;
+            position: absolute;
+            border-radius: 5px;
+            background-size: cover}
+            
+    
+        </style>
+
+		<script type="text/javascript">
+	        puntos = 0;
+            vidas = 3;
+            
+			window.onload= function(){
+                document.getElementById("puntos").innerHTML = "Puntos: " + puntos;
+                document.getElementById("vidas").innerHTML = "Vidas: " + vidas;
+				
+				contenedor= document.getElementById("contenedor");
+				contenedora = document.getElementById("contenedora");
+                
+                //num ladrillos
+                contLadrillo = 0;
+				
+				//pantalla contenedora
+                anchoCaja=900;
+                altoCaja=600;
+				
+				//pelota
+                ancho = 15;
+                alto=15;
+				
+                //barra
+				xPalo=400;
+				altoBarra=30;
+				anchoBarra=100;
+                
+                //ladrillo
+                yLadrillo=40;
+                xLadrillo=100;
+				
+                pelota= new Pelota(460,480,1,0,1);
+                barra = new Barra(480,500); 
+			
+					function Pelota (xPelota, yPelota, EjeX, EjeY, speed){
+						this.xPelota = xPelota;
+						this.yPelota = yPelota;
+						this.EjeX = EjeX;
+						this.EjeY = EjeY;
+						this.speed = speed
+					}
+					
+					function Barra(xPalo, yPalo){
+						this.xPalo = xPalo;
+						this.yPalo = yPalo;
+					}
+                
+                
+					function Ladrillo (xLadrillo, yLadrillo){
+						this.x = xLadrillo;
+						this.y = yLadrillo;
+					}
+					
+					Pelota.prototype.addPelota = function(){
+						this.bola = document.createElement("img");				
+					    this.bola.setAttribute("id","pelota")
+                        this.bola.src ="imagenes/pelota.png";
+                        //this.bola.style.backgroundColor ="#FFBF00";
+						this.bola.style.height = alto + "px"
+						this.bola.style.width = ancho + "px"
+                        this.bola.style.position="relative";
+						this.bola.style.left = this.xPelota + "px";
+						this.bola.style.top = this.yPelota + "px";
+						contenedor.appendChild(this.bola);
+                        
+					}
+					
+					Barra.prototype.addBarra = function(){
+						this.barra = document.createElement("img");
+						this.barra.setAttribute("id", "barra");
+                        this.barra.src ="imagenes/raqueta2.png";
+						this.barra.style.width = anchoBarra +"px";
+                        this.barra.style.height = altoBarra +"px";
+                        //this.barra.style.backgroundColor ="#FFBF00";
+                        this.barra.style.position="absolute";
+						this.barra.style.left = this.xPalo + "px";
+						this.barra.style.top = this.yPalo + "px";
+                        //this.barra.style.border="solid #FFBF00 1px";
+						this.barra.style.borderRadius="5px";
+						contenedora.appendChild(this.barra);
+					}
+					
+					Ladrillo.prototype.addLadrillo = function(){
+					
+						this.ladrillo =  document.createElement("img");
+                        this.ladrillo.setAttribute("id", contLadrillo + "");
+                        this.ladrillo.src ="imagenes/ladrillo.png";
+						this.ladrillo.style.width= xLadrillo + "px"
+						this.ladrillo.style.height= yLadrillo + "px"
+						this.ladrillo.style.backgroundColor ="#B40404";
+						this.ladrillo.style.left = this.x +"px" ;
+						this.ladrillo.style.top = this.y  +"px";
+						this.ladrillo.style.position="absolute";
+                        this.ladrillo.style.margin="5px";
+						this.ladrillo.style.borderRadius="2px";
+						contenedor.appendChild(this.ladrillo);
+                        contLadrillo++;
+					}
+                    
+                    Pelota.prototype.MoverPelota = function(){
+                        var xBola =   parseInt(document.getElementById("pelota").style.left)
+                        var yBola= parseInt(document.getElementById("pelota").style.top)
+						
+						
+						//ejeX
+                        if(pelota.EjeX==1){
+                            xBola+=pelota.speed ;
+                        }
+                        else{
+                            xBola-=pelota.speed ;
+                        }
+                        
+                        if(xBola + ancho>=anchoCaja){
+						xBola=anchoCaja - ancho;
+						pelota.EjeX=0;
+						
+                        }
+                      
+                        else if(xBola <=0){
+                           xBola=0;
+                            pelota.EjeX=1;
+                        }
+                        
+                        //ejeY
+                        if(pelota.EjeY==1){
+                            yBola+= pelota.speed ;
+                        }
+                        else{
+                            yBola-= pelota.speed ;
+                        }
+                        
+                        if(yBola + alto>=altoCaja){
+                            yBola=470;
+                            xBola=480;
+                            pelota.EjeY=0;
+                            pelota.EjeX=1;
+                            vidas -= 1;
+                            puntos -= 50;
+                            document.getElementById("vidas").innerHTML = "Vidas: " + vidas;
+                            document.getElementById("puntos").innerHTML = "Puntos: " + puntos;
+                            if(vidas == 0){
+                                clearInterval(intervalo);
+                                document.getElementById("contenedora").removeChild(document.getElementById("barra"));
+                                if(document.getElementById("contenedor").hasChildNodes()){
+						          while(document.getElementById("contenedor").childNodes.length >= 1){
+                                      document.getElementById("contenedor").removeChild(document.getElementById("contenedor").firstChild);
+						          }
+                                }
+                                var lose = document.createElement("img");
+                                lose.src = "imagenes/gameover.gif";
+                                lose.style.top = "5px";
+                                lose.style.height = "600px";
+                                lose.style.width = "900px";
+                                lose.style.position = "absolute";
+                                document.getElementById("contenedora").appendChild(lose);
+                                alert("Pulsa f5 para volver a Jugar");           
+
+                            }  
+                        }
+                        
+                        else if(yBola <=0){
+                            yBola=0;
+                            pelota.EjeY=1;   
+                        }
+                        
+                        if(xBola >= barra.xPalo && xBola<= barra.xPalo+anchoBarra && yBola >= 483){
+						  pelota.EjeY=0;
+						}
+                        
+                       //solo la pelota
+                        if(document.getElementById("contenedor").childElementCount == 1){
+                            clearInterval(intervalo);
+                            var fin = document.createElement("img");
+                            fin.src = "imagenes/bienjugado.png";
+                            fin.style.top = "5px";
+                            fin.style.height = "600px";
+                            fin.style.width = "900px";
+                            fin.style.position = "absolute";
+                            document.getElementById("contenedora").appendChild(fin);
+                            alert("Puls f5 para volver a Jugar");           
+                        }
+                        
+                        //colisionLadrillos
+                        for(i = 0; i < ladrillo.length; i++){
+                            if(yBola + alto == ladrillo[i].y && xBola >= ladrillo[i].x && xBola <= ladrillo[i].x + xLadrillo && pelota.EjeX == 0){
+                                pelota.EjeX = 0;
+                                pelota.EjeY = 0;
+                                document.getElementById("contenedor").removeChild(document.getElementById(i+""));
+                                ladrillo[i] = "";
+                                puntos += 100;
+                                document.getElementById("puntos").innerHTML = "Puntos: " + puntos;
+                            }
+                            else if(yBola + alto == ladrillo[i].y && xBola >= ladrillo[i].x && xBola <= ladrillo[i].x + xLadrillo && pelota.EjeX == 1){
+								pelota.EjeX = 1;
+								pelota.EjeY = 0;
+								document.getElementById("contenedor").removeChild(document.getElementById(i+""));
+                                ladrillo[i] = "";
+                                puntos += 100;
+                                document.getElementById("puntos").innerHTML = "Puntos: " + puntos;
+							}
+                            else if(yBola >= ladrillo[i].y && yBola <= ladrillo[i].y + yLadrillo && xBola + ancho == ladrillo[i].x && pelota.EjeX == 1 && pelota.EjeY == 0){
+								pelota.EjeX = 0;
+								pelota.EjeY = 0;
+								document.getElementById("contenedor").removeChild(document.getElementById(i+""));
+                                ladrillo[i] = "";
+                                puntos += 100;
+                                document.getElementById("puntos").innerHTML = "Puntos: " + puntos;
+							}
+                            else if(yBola >= ladrillo[i].y && yBola <= ladrillo[i].y + yLadrillo && xBola + ancho == ladrillo[i].x && pelota.EjeX == 1 && pelota.EjeY == 1){
+								pelota.EjeX = 0;
+								pelota.EjeY = 1;
+								document.getElementById("contenedor").removeChild(document.getElementById(i+""));
+                                ladrillo[i] = "";
+                                puntos += 100;
+                                document.getElementById("puntos").innerHTML = "Puntos: " + puntos;
+							}
+                            else if(yBola >= ladrillo[i].y && yBola <= ladrillo[i].y + yLadrillo && xBola == ladrillo[i].x + xLadrillo && pelota.EjeX == 0 && pelota.EjeY == 1){
+								pelota.EjeX = 1;
+								pelota.EjeY = 1;
+								document.getElementById("contenedor").removeChild(document.getElementById(i+""));
+                                ladrillo[i] = "";
+                                puntos += 100;
+                                document.getElementById("puntos").innerHTML = "Puntos: " + puntos;
+							}
+                            else if(xBola >= ladrillo[i].x && xBola <= ladrillo[i].x + xLadrillo && yBola == ladrillo[i].y + yLadrillo && pelota.EjeX == 0 && pelota.EjeY == 0){
+								pelota.EjeX = 0;
+								pelota.EjeY = 1;
+								document.getElementById("contenedor").removeChild(document.getElementById(i+""));
+                                ladrillo[i] = "";
+                                puntos += 100;
+                                document.getElementById("puntos").innerHTML = "Puntos: " + puntos;
+							}
+                            else if(xBola >= ladrillo[i].x && xBola <= ladrillo[i].x + xLadrillo&& yBola == ladrillo[i].y + yLadrillo && pelota.EjeX == 1 && pelota.EjeY == 0 ){
+								pelota.EjeX = 1;
+								pelota.EjeY = 1;
+								document.getElementById("contenedor").removeChild(document.getElementById(i+""));
+                                ladrillo[i] = "";
+                                puntos += 100;
+                                document.getElementById("puntos").innerHTML = "Puntos: " + puntos;
+							}
+                            else if(yBola >= ladrillo[i].y && yBola <= ladrillo[i].y + yLadrillo && xBola == ladrillo[i].x + xLadrillo && pelota.EjeX == 0 && pelota.EjeY == 0){
+								pelota.EjeX = 1;
+								pelota.EjeY = 0;
+								ladrillo[i] = "";
+								document.getElementById("rectangulo").removeChild(document.getElementById(i+""));
+                                //da error al hacer la colision y no se por que
+                                puntos += 100;
+                                document.getElementById("puntos").innerHTML = "Puntos: " + puntos;
+							}  
+                            
+                        }
+                          
+                       document.getElementById("pelota").style.top = yBola +"px";
+                       document.getElementById("pelota").style.left = xBola +"px";   
+                    }
+                    
+                    
+                    Barra.prototype.MoverBarra = function(elEvento){
+                        var evento = window.event || elEvento;
+                        
+                        var clienteY = evento.clientY;
+                        var clienteX = evento.clientX;
+                        
+                        if(clienteX + anchoBarra / 2 <= anchoCaja && clienteX >= 0 && clienteY >= 0 && clienteY <= altoCaja){
+                            barra.xPalo = clienteX - anchoBarra / 2;
+                        }
+                        
+                        if(evento.keyCode == 39 && barra.xPalo < anchoCaja - anchoBarra){
+                            barra.xPalo += 25;
+                        }
+                        if(evento.keyCode == 37 && barra.xPalo > 0){
+                            barra.xPalo -= 25;
+                        }
+                        if(barra.xPalo + anchoBarra > anchoCaja){
+                            barra.xPalo = anchoCaja - anchoBarra;
+                        }
+                        else if(barra.xPalo < 0){
+                            barra.xPalo = 0;
+                        }
+                        
+                        document.getElementById("barra").style.left = barra.xPalo + "px";
+                    }
+				x = 200;
+                y = 120;
+                    
+                ladrillo = new Array();
+                numLadrillos=0;
+                for(i = 0 ; i<4; i++){
+                    for(j=0;j<5;j++){
+                        ladrillo[numLadrillos] = new Ladrillo(x,y);
+                        numLadrillos++;
+                        x+= 105;
+                    }
+                    x=200
+                    y+=45;
+                }
+                for(i=0;i<numLadrillos;i++){
+                    ladrillo[i].addLadrillo();
+                }
+                
+                pelota.addPelota();
+				barra.addBarra();
+                intervalo=window.setInterval(pelota.MoverPelota,6);
+                document.onkeyup = barra.MoverBarra;
+				document.onkeypress = barra.MoverBarra;
+				document.onkeydown = barra.MoverBarra;
+                
+                document.onmousemove = barra.MoverBarra;
+                document.onmouseover = barra.MoverBarra;
+			}				
+		</script>
+	</head>
+	<body>
+	<div id = "contenedora">
+                
+    </div>
+	<div id = "contenedor">
+                
+    </div>
+        <div  id="puntos"></div>
+        <div  id="vidas"></div>	
+	</body>
+</html>
